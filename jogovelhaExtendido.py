@@ -31,9 +31,10 @@ Um versão simples do algoritmo MINIMAX para o Jogo da Velha.
 HUMANO = -1
 COMP = +1
 tabuleiro = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
 ]
 
 """
@@ -64,18 +65,20 @@ def vitoria(estado, jogador):
     :return: True se jogador vence
     """
     win_estado = [
-        [estado[0][0], estado[0][1], estado[0][2]], # toda linha 1
-        [estado[1][0], estado[1][1], estado[1][2]], # toda linha 2
-        [estado[2][0], estado[2][1], estado[2][2]], # toda linha 3
-        [estado[0][0], estado[1][0], estado[2][0]], # toda coluna 1
-        [estado[0][1], estado[1][1], estado[2][1]], # toda coluna 2
-        [estado[0][2], estado[1][2], estado[2][2]], # toda coluna 3
-        [estado[0][0], estado[1][1], estado[2][2]], # diagonal principal
-        [estado[2][0], estado[1][1], estado[0][2]], # diagonal secundária
+        [estado[0][0], estado[0][1], estado[0][2], estado[0][3]], # toda linha 1
+        [estado[1][0], estado[1][1], estado[1][2], estado[1][3]], # toda linha 2
+        [estado[2][0], estado[2][1], estado[2][2], estado[2][3]], # toda linha 3
+        [estado[3][0], estado[3][1], estado[3][2], estado[3][3]], # toda linha 4
+        [estado[0][0], estado[1][0], estado[2][0], estado[3][0]], # toda coluna 1
+        [estado[0][1], estado[1][1], estado[2][1], estado[3][1]], # toda coluna 2
+        [estado[0][2], estado[1][2], estado[2][2], estado[3][2]], # toda coluna 3
+        [estado[0][3], estado[1][3], estado[2][3], estado[3][3]], # toda coluna 4
+        [estado[0][0], estado[1][1], estado[2][2], estado[3][3]], # diagonal principal
+        [estado[3][0], estado[2][1], estado[1][2], estado[0][3]], # diagonal secundária
     ]
     # Se um, dentre todos os alinhamentos pertence um mesmo jogador, 
     # então o jogador vence!
-    if [jogador, jogador, jogador] in win_estado:
+    if [jogador, jogador, jogador, jogador] in win_estado:
         return True
     else:
         return False
@@ -210,9 +213,9 @@ def IA_vez(comp_escolha, humano_escolha):
     print('Vez do Computador [{}]'.format(comp_escolha))
     exibe_tabuleiro(tabuleiro, comp_escolha, humano_escolha)
 
-    if profundidade == 9:
-        x = choice([0, 1, 2])
-        y = choice([0, 1, 2])
+    if profundidade == 16:
+        x = choice([0, 1, 2, 3])
+        y = choice([0, 1, 2, 3])
     else:
         move = minimax(tabuleiro, profundidade, COMP)
         x, y = move[0], move[1]
@@ -235,18 +238,19 @@ def HUMANO_vez(comp_escolha, humano_escolha):
     # Dicionário de movimentos válidos
     movimento = -1
     movimentos = {
-        1: [0, 0], 2: [0, 1], 3: [0, 2],
-        4: [1, 0], 5: [1, 1], 6: [1, 2],
-        7: [2, 0], 8: [2, 1], 9: [2, 2],
+        1: [0, 0], 2: [0, 1], 3: [0, 2], 4: [0, 3],
+        5: [1, 0], 6: [1, 1], 7: [1, 2], 8: [1, 3],
+        9: [2, 0], 10: [2, 1], 11: [2, 2], 12: [2, 3],
+        13: [3, 0], 14: [3, 1], 15: [3, 2], 16: [3, 3],
     }
 
     limpa_console()
     print('Vez do HUMANO [{}]'.format(humano_escolha))
     exibe_tabuleiro(tabuleiro, comp_escolha, humano_escolha)
 
-    while (movimento < 1 or movimento > 9):
+    while (movimento < 1 or movimento > 16):
         try:
-            movimento = int(input('Use numero (1..9): '))
+            movimento = int(input('Use numero (1..16): '))
             coord = movimentos[movimento]
             tenta_movimento = exec_movimento(coord[0], coord[1], HUMANO)
 
