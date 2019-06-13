@@ -31,10 +31,9 @@ Um versão simples do algoritmo MINIMAX para o Jogo da Velha.
 HUMANO = -1
 COMP = +1
 tabuleiro = [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
 ]
 
 """
@@ -43,16 +42,11 @@ Funcao para avaliacao heuristica do estado.
 :returna: +1 se o computador vence; -1 se o HUMANOo vence; 0 empate
  """
 def avaliacao(estado, profundidade):
-    #print('Profundidade inicial: ',profundidade) 
-    #input("Pressione <enter> para continuar")
+    
     if (profundidade % 2 == 0 and profundidade > 0):
-     #   print('Profundidade comparação: ',profundidade) 
-      #  input("Pressione <enter> para continuar")
-        pontos = 1 + (profundidade // 2)
-       # print('Pontos: ',pontos) 
-        #input("Pressione <enter> para continuar")
+        pontos = (profundidade // 2)
     else:
-        pontos = 1 + ((profundidade + 1)//2)
+        pontos = ((profundidade + 1)//2)
 
     if vitoria(estado, COMP):
         placar = + pontos #1
@@ -78,20 +72,18 @@ def vitoria(estado, jogador):
     :return: True se jogador vence
     """
     win_estado = [
-        [estado[0][0], estado[0][1], estado[0][2], estado[0][3]], # toda linha 1
-        [estado[1][0], estado[1][1], estado[1][2], estado[1][3]], # toda linha 2
-        [estado[2][0], estado[2][1], estado[2][2], estado[2][3]], # toda linha 3
-        [estado[3][0], estado[3][1], estado[3][2], estado[3][3]], # toda linha 4
-        [estado[0][0], estado[1][0], estado[2][0], estado[3][0]], # toda coluna 1
-        [estado[0][1], estado[1][1], estado[2][1], estado[3][1]], # toda coluna 2
-        [estado[0][2], estado[1][2], estado[2][2], estado[3][2]], # toda coluna 3
-        [estado[0][3], estado[1][3], estado[2][3], estado[3][3]], # toda coluna 4
-        [estado[0][0], estado[1][1], estado[2][2], estado[3][3]], # diagonal principal
-        [estado[3][0], estado[2][1], estado[1][2], estado[0][3]], # diagonal secundária
+        [estado[0][0], estado[0][1], estado[0][2]], # toda linha 1
+        [estado[1][0], estado[1][1], estado[1][2]], # toda linha 2
+        [estado[2][0], estado[2][1], estado[2][2]], # toda linha 3
+        [estado[0][0], estado[1][0], estado[2][0]], # toda coluna 1
+        [estado[0][1], estado[1][1], estado[2][1]], # toda coluna 2
+        [estado[0][2], estado[1][2], estado[2][2]], # toda coluna 3
+        [estado[0][0], estado[1][1], estado[2][2]], # diagonal principal
+        [estado[2][0], estado[1][1], estado[0][2]], # diagonal secundária
     ]
     # Se um, dentre todos os alinhamentos pertence um mesmo jogador, 
     # então o jogador vence!
-    if [jogador, jogador, jogador, jogador] in win_estado:
+    if [jogador, jogador, jogador] in win_estado:
         return True
     else:
         return False
@@ -154,40 +146,30 @@ mas nunca será nove neste caso (veja a função iavez())
 """
 def minimax(estado, profundidade, jogador):
 
-    print('Profundidade inicial: ',profundidade) 
-    input("Pressione <enter> para continuar")
     # valor-minmax(estado)
     if jogador == COMP:
         melhor = [-1, -1, -infinity]
-        #print('estado mim-max ', melhor)
     else:
         melhor = [-1, -1, +infinity]
-      
+
     # valor-minimax(estado) = avaliacao(estado)
     if profundidade == 0 or fim_jogo(estado):
-        print('Profundidade inicial minmax: ',profundidade) 
-        input("Pressione <enter> para continuar")
         placar = avaliacao(estado, profundidade)
-       # print('estado de avaliação ',placar)
         return [-1, -1, placar]
 
     for cell in celulas_vazias(estado):
         x, y = cell[0], cell[1]
         estado[x][y] = jogador
-        #print('minMax celula ', estado)
         placar = minimax(estado, profundidade - 1, -jogador)
         estado[x][y] = 0
         placar[0], placar[1] = x, y
-        #print('Profundidade: ',profundidade)
 
         if jogador == COMP:
             if placar[2] > melhor[2]:
-                melhor = placar
-                #print('cheguei aqui ',melhor)  # valor MAX
+                melhor = placar  # valor MAX
         else:
             if placar[2] < melhor[2]:
                 melhor = placar  # valor MIN
-                #print(melhor)
     return melhor
 """ ---------------------------------------------------------- """
 
@@ -207,9 +189,9 @@ Imprime o tabuleiro no console
 :param. (estado): estado atual do tabuleiro
 """
 def exibe_tabuleiro(estado, comp_escolha, humano_escolha):
-    print('--------------------')
+    print('----------------')
     for row in estado:
-        print('\n--------------------')
+        print('\n----------------')
         for cell in row:
             if cell == +1:
                 print('|', comp_escolha, '|', end='')
@@ -217,7 +199,7 @@ def exibe_tabuleiro(estado, comp_escolha, humano_escolha):
                 print('|', humano_escolha, '|', end='')
             else:
                 print('|', ' ', '|', end='')
-    print('\n-------------------')
+    print('\n----------------')
 """ ---------------------------------------------------------- """
 
 """
@@ -229,8 +211,6 @@ ou escolhe uma coordenada aleatória.
 """
 def IA_vez(comp_escolha, humano_escolha):
     profundidade = len(celulas_vazias(tabuleiro))
-    #print('profundidade: ',profundidade)
-    #input("Pressione <enter> para continuar")
     if profundidade == 0 or fim_jogo(tabuleiro):
         return
 
@@ -238,9 +218,9 @@ def IA_vez(comp_escolha, humano_escolha):
     print('Vez do Computador [{}]'.format(comp_escolha))
     exibe_tabuleiro(tabuleiro, comp_escolha, humano_escolha)
 
-    if profundidade == 16:
-        x = choice([0, 1, 2, 3])
-        y = choice([0, 1, 2, 3])
+    if profundidade == 9:
+        x = choice([0, 1, 2])
+        y = choice([0, 1, 2])
     else:
         move = minimax(tabuleiro, profundidade, COMP)
         x, y = move[0], move[1]
@@ -263,19 +243,18 @@ def HUMANO_vez(comp_escolha, humano_escolha):
     # Dicionário de movimentos válidos
     movimento = -1
     movimentos = {
-        1: [0, 0], 2: [0, 1], 3: [0, 2], 4: [0, 3],
-        5: [1, 0], 6: [1, 1], 7: [1, 2], 8: [1, 3],
-        9: [2, 0], 10: [2, 1], 11: [2, 2], 12: [2, 3],
-        13: [3, 0], 14: [3, 1], 15: [3, 2], 16: [3, 3],
+        1: [0, 0], 2: [0, 1], 3: [0, 2],
+        4: [1, 0], 5: [1, 1], 6: [1, 2],
+        7: [2, 0], 8: [2, 1], 9: [2, 2],
     }
 
     limpa_console()
     print('Vez do HUMANO [{}]'.format(humano_escolha))
     exibe_tabuleiro(tabuleiro, comp_escolha, humano_escolha)
 
-    while (movimento < 1 or movimento > 16):
+    while (movimento < 1 or movimento > 9):
         try:
-            movimento = int(input('Use numero (1..16): '))
+            movimento = int(input('Use numero (1..9): '))
             coord = movimentos[movimento]
             tenta_movimento = exec_movimento(coord[0], coord[1], HUMANO)
 
