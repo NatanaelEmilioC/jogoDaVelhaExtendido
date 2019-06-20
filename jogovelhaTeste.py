@@ -41,22 +41,23 @@ Funcao para avaliacao heuristica do estado.
 :parametro (estado): o estado atual do tabuleiro
 :returna: +1 se o computador vence; -1 se o HUMANOo vence; 0 empate
  """
-def avaliacao(estado, profundidade):
-    
-    if (profundidade % 2 == 0 and profundidade > 0):
-        pontos = (profundidade // 2)
-    else:
+def avaliacao(estado, profundidade):    #print('Profundidade inicial: ',profundidade) input("Pressione <enter> para continuar")
+    pontos = 1
+    if (profundidade % 2 == 0 and profundidade > 1):    #print('Profundidade comparação: ',profundidade)   input("Pressione <enter> para continuar")
+        pontos = (profundidade // 2)    #print('Pontos: ',pontos) input("Pressione <enter> para continuar")
+    elif(profundidade % 2 == 1 and profundidade > 1):
         pontos = ((profundidade + 1)//2)
 
     if vitoria(estado, COMP):
-        placar = + pontos #1
+        placar = pontos #1
     elif vitoria(estado, HUMANO):
-        placar = - pontos #1
+        placar = (pontos * (-1)) #1
     else:
         placar = 0
-       
-    print('Placar: ',placar) 
-    input("Pressione <enter> para continuar")
+    
+    if profundidade > 3: 
+        print('Profundidade: ',profundidade) 
+    #input("Pressione <enter> para continuar")
    
     return placar
 """ fim avaliacao (estado)------------------------------------- """
@@ -144,9 +145,8 @@ mas nunca será nove neste caso (veja a função iavez())
 :param (jogador): um HUMANO ou um Computador
 :return: uma lista com [melhor linha, melhor coluna, melhor placar]
 """
-def minimax(estado, profundidade, jogador):
-
-    # valor-minmax(estado)
+def minimax(estado, profundidade, jogador, alpha, beta): #print('Profundidade inicial: ',profundidade)  input("Pressione <enter> para continuar")
+ # valor-minmax(estado)
     if jogador == COMP:
         melhor = [-1, -1, -infinity]
     else:
@@ -155,21 +155,38 @@ def minimax(estado, profundidade, jogador):
     # valor-minimax(estado) = avaliacao(estado)
     if profundidade == 0 or fim_jogo(estado):
         placar = avaliacao(estado, profundidade)
+        if jogador == COMP:
+            if placar >= beta:
+                alpha = max(alpha, placar)
+                #return [-1, -1, beta]
+        else:
+            if placar <= alpha: # valor MIN
+                beta = min(beta, placar) #valor MIN
+                #return [-1, -1, alpha]
+    
         return [-1, -1, placar]
 
     for cell in celulas_vazias(estado):
         x, y = cell[0], cell[1]
         estado[x][y] = jogador
-        placar = minimax(estado, profundidade - 1, -jogador)
+        placar = minimax(estado, profundidade - 1, -jogador, alpha,beta)
         estado[x][y] = 0
         placar[0], placar[1] = x, y
 
         if jogador == COMP:
             if placar[2] > melhor[2]:
-                melhor = placar  # valor MAX
+                melhor = placar # valor MAX
+                if placar[2] >= beta:
+                    alpha = max(alpha, placar[2])
+                    return [-1, -1, alpha]
+        
         else:
             if placar[2] < melhor[2]:
-                melhor = placar  # valor MIN
+                melhor = placar
+                if placar[2] <= alpha: # valor MIN
+                    beta = min(beta, placar[2]) #valor MIN
+                    return [-1, -1, beta]
+           
     return melhor
 """ ---------------------------------------------------------- """
 
@@ -222,7 +239,7 @@ def IA_vez(comp_escolha, humano_escolha):
         x = choice([0, 1, 2])
         y = choice([0, 1, 2])
     else:
-        move = minimax(tabuleiro, profundidade, COMP)
+        move = minimax(tabuleiro, profundidade, COMP, -infinity, +infinity)
         x, y = move[0], move[1]
 
     exec_movimento(x, y, COMP)
