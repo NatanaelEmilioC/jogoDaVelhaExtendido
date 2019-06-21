@@ -11,6 +11,13 @@ na disciplina de Inteligência Artificial - CSI457
 Semestre: 2018/2
 """
 
+"""
+Natanael Emilio da Costa
+Matricula : 16.1.8298
+Semestre: 2019/1
+Jogo da Velha extendido 4x4 com corte alpha-beta
+"""
+
 #!/usr/bin/env python3
 from math import inf as infinity
 from random import choice
@@ -42,23 +49,19 @@ Funcao para avaliacao heuristica do estado.
 :parametro (estado): o estado atual do tabuleiro
 :returna: +1 se o computador vence; -1 se o HUMANOo vence; 0 empate
  """
-def avaliacao(estado, profundidade):    #print('Profundidade inicial: ',profundidade) input("Pressione <enter> para continuar")
-    pontos = 1
-    if (profundidade % 2 == 0 and profundidade > 1):    #print('Profundidade comparação: ',profundidade)   input("Pressione <enter> para continuar")
-        pontos = (profundidade // 2)    #print('Pontos: ',pontos) input("Pressione <enter> para continuar")
-    elif(profundidade % 2 == 1 and profundidade > 1):
+def avaliacao(estado, profundidade):
+    pontos = 1 # a menor pontuação possivel é 1
+    if (profundidade % 2 == 0 and profundidade > 1):# a pontuação tem ligação direta com a profundidade do fim do jogo
+        pontos = (profundidade // 2)
+    elif(profundidade % 2 == 1 and profundidade > 1):# para porfundidade impar é adicionado mais um antes de dividir por 2
         pontos = ((profundidade + 1)//2)
 
     if vitoria(estado, COMP):
-        placar = pontos #1
+        placar = pontos # atribui pontuação positiva caso vitória da máquina
     elif vitoria(estado, HUMANO):
-        placar = (pontos * (-1)) #1
+        placar = (pontos * (-1)) #atribui pontuação negativa caso vitória do humano
     else:
-        placar = 0
-    
-    if profundidade > 6: 
-        print('Profundidade: ',profundidade) 
-    #input("Pressione <enter> para continuar")
+        placar = 0 # caso do empate
    
     return placar
 """ fim avaliacao (estado)------------------------------------- """
@@ -87,7 +90,7 @@ def vitoria(estado, jogador):
     ]
     # Se um, dentre todos os alinhamentos pertence um mesmo jogador, 
     # então o jogador vence!
-    if [jogador, jogador, jogador, jogador] in win_estado:
+    if [jogador, jogador, jogador, jogador] in win_estado:# adicionado mais um parametro por conta do redimencionamento do tabuleiro
         return True
     else:
         return False
@@ -148,7 +151,7 @@ mas nunca será nove neste caso (veja a função iavez())
 :param (jogador): um HUMANO ou um Computador
 :return: uma lista com [melhor linha, melhor coluna, melhor placar]
 """
-def minimax(estado, profundidade, jogador, alpha, beta): #print('Profundidade inicial: ',profundidade)  input("Pressione <enter> para continuar")
+def minimax(estado, profundidade, jogador, alpha, beta): # adicionados paramatros para alpha e beta
     # valor-minmax(estado)
     if jogador == COMP:
         melhor = [-1, -1, -infinity]
@@ -157,31 +160,31 @@ def minimax(estado, profundidade, jogador, alpha, beta): #print('Profundidade in
 
     # valor-minimax(estado) = avaliacao(estado)
     if profundidade == 0 or fim_jogo(estado):
-        placar = avaliacao(estado, profundidade)    
+        placar = avaliacao(estado, profundidade) # adicionada a profundidade como parametro para facilitar o calculo dos pontos   
         return [-1, -1, placar]
 
     for cell in celulas_vazias(estado):
         x, y = cell[0], cell[1]
         estado[x][y] = jogador
-        placar = minimax(estado, profundidade - 1, -jogador, alpha,beta)
+        placar = minimax(estado, profundidade - 1, -jogador, alpha, beta) # mantendo alpha e beta no fluxo de execução
         estado[x][y] = 0
         placar[0], placar[1] = x, y
 
         if jogador == COMP:
-            if alpha < placar[2]:
-                alpha = placar[2]
-                melhor = placar
+            if alpha < placar[2]: # avaliação do valor de alpha
+                alpha = placar[2] # atribuindo novo valor à alpha
+                melhor = placar # atribuindo melhor jogada com base em alpha
             if alpha >= beta:
-                return [-1, -1, alpha]
+                return [-1, -1, alpha] # retorno de alpha para corte alpha-beta
         
         else:
-            if beta > placar[2]:
-                beta = placar[2]
-                melhor = placar
+            if beta > placar[2]: # avaliação do valor de beta
+                beta = placar[2] # atualizando valor em beta
+                melhor = placar # melhor jogada em beta 
             if alpha >= beta:
-                return [-1, -1, beta]
+                return [-1, -1, beta] # retorno de beta para o corte
 
-    return melhor
+    return melhor # retorno da melhor jogada
 """ ---------------------------------------------------------- """
 
 """
@@ -229,11 +232,11 @@ def IA_vez(comp_escolha, humano_escolha):
     print('Vez do Computador [{}]'.format(comp_escolha))
     exibe_tabuleiro(tabuleiro, comp_escolha, humano_escolha)
 
-    if profundidade == 16:
-        x = choice([0, 1, 2, 3])
+    if profundidade == 16: # ajuste da profundidade em razão da dimensão do tabuleiro   
+        x = choice([0, 1, 2, 3]) # atição de valor para calculo da jogada aleátoria inicial
         y = choice([0, 1, 2, 3])
     else:
-        move = minimax(tabuleiro, profundidade, COMP, -infinity, +infinity)
+        move = minimax(tabuleiro, profundidade, COMP, -infinity, +infinity) # chamada do min-max alpha-beta com inicialização dos valores de alpha e beta
         x, y = move[0], move[1]
 
     exec_movimento(x, y, COMP)
@@ -251,7 +254,7 @@ def HUMANO_vez(comp_escolha, humano_escolha):
     if profundidade == 0 or fim_jogo(tabuleiro):
         return
 
-    # Dicionário de movimentos válidos
+    # Dicionário de movimentos válidos com inclusão das novas possibilidades
     movimento = -1
     movimentos = {
         1: [0, 0], 2: [0, 1], 3: [0, 2], 4: [0, 3],
